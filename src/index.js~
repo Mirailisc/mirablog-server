@@ -1,0 +1,17 @@
+import { ApolloServer } from 'apollo-server'
+import { schemas as typeDefs } from './graphql/schema.js'
+import { resolvers } from './graphql/resolvers.js'
+import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core'
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  csrfPrevention: true,
+  cache: 'bounded',
+  plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+})
+
+// The `listen` method launches a web server.
+server.listen(8080).then(async ({ url }) => {
+  console.log(`🚀  Server ready at ${url}`)
+})
