@@ -11,7 +11,7 @@ yarn install
 
 Setup `.env` file:
 ```
-DATABASE_URL="mongodb+srv://admin_mirailisc:Miracle_48@cluster0.qjrht.mongodb.net/Test"
+DATABASE_URL=<your_database_url>
 ```
 for development only
 ```
