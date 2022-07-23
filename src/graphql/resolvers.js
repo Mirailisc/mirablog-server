@@ -11,7 +11,19 @@ export const resolvers = {
 
   Query: {
     articles: () => {
-      return prisma.articles.findMany()
+      return prisma.articles.findMany({
+        select: {
+          title: true,
+          author: {
+            select: {
+              first_name: true,
+              last_name: true,
+            },
+          },
+          markdown_detail: true,
+          createdAt: true,
+        },
+      })
     },
     users: () => {
       return prisma.users.findMany()
@@ -19,11 +31,11 @@ export const resolvers = {
   },
 
   Mutation: {
-    createArticle: async (_, { title, markdown_detail }) => {
+    createArticle: async (_, { title, markdown_detail, author_id }) => {
       await prisma.articles.create({
         data: {
           title: title,
-          author_id: '62d9a84ef9c58885dc892734',
+          author_id: author_id,
           markdown_detail: markdown_detail,
         },
       })
@@ -90,31 +102,36 @@ export const resolvers = {
         },
       })
 
-      // Check if the entered password equals the encrypted password
-      if (user && bcrypt.compare(password, user.password)) {
-        // Create n NEW token
-        const jwtToken = jwt.sign({ userId: user.id, email, name: user.name }, 'YOUR_MOM', { expiresIn: '2h' })
-
-        // Attach token to user model
-        await prisma.users.update({
-          where: {
-            email: email,
-          },
-          data: {
-            token: jwtToken,
-          },
-        })
-
-        return {
-          id: user.id,
-          user: {
-            email: user.email,
-            token: user.token
-          }
-        }
+      if (!user) {
+        throw new ApolloError('User does not exist', 'USER_DOES_NOT_EXIST')
       } else {
-        // If user doesn't exist, return error
-        throw new ApolloError('Incorrect password', 'INCORRECT_PASSWORD')
+        // Compare password with existing password
+        const passwordCompare = await bcrypt.compare(password, user.password)
+
+        if (passwordCompare) {
+          // Create n NEW token
+          const jwtToken = jwt.sign({ userId: user.id, email, name: user.name }, 'YOUR_MOM', { expiresIn: '2h' })
+
+          // Attach token to user model
+          await prisma.users.update({
+            where: {
+              email: email,
+            },
+            data: {
+              token: jwtToken,
+            },
+          })
+
+          return {
+            id: user.id,
+            user: {
+              email: user.email,
+              token: user.token,
+            },
+          }
+        } else {
+          throw new ApolloError('Incorrect password', 'INCORRECT_PASSWORD')
+        }
       }
     },
   },

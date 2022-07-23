@@ -6,6 +6,7 @@ export const schemas = gql`
   type Article {
     id: String
     title: String
+    author: User
     author_id: String
     markdown_detail: String!
     createdAt: DateTime!
@@ -36,7 +37,7 @@ export const schemas = gql`
   }
 
   type Mutation {
-    createArticle(title: String, markdown_detail: String!): Article
+    createArticle(title: String, markdown_detail: String!, author_id: String): Article
     createUser(name: String, email: String, first_name: String, last_name: String, password: String): User
     login(email: String, password: String!): AuthData
   }
