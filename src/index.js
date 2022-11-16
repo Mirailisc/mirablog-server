@@ -11,10 +11,6 @@ const server = new ApolloServer({
   resolvers,
   csrfPrevention: true,
   cache: 'bounded',
-  // cors: {
-  //   origin: ["https://blog.mirailisc.me/", "http://localhost:3000/"],
-  //   credentials: true,
-  // },
   plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
 })
 
